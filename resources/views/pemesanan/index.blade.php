@@ -5,93 +5,123 @@
     <title>Pemesanan Tiket</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
-<div class="relative min-h-screen">
+<body class="bg-gray-100">
 
-    <!-- BACKGROUND -->
-    <img src="{{ asset('images/bg.png') }}"
-         class="absolute w-full h-full object-cover">
+<div class="flex h-screen">
 
-    <!-- OVERLAY -->
-    <div class="absolute w-full h-full bg-black/50"></div>
+    <!-- SIDEBAR -->
+    <div class="w-64 bg-gray-100 border-r flex flex-col justify-between">
 
-    <!-- NAVBAR -->
-    <div class="absolute top-0 w-full bg-[#1e1b2e] text-white px-10 py-4 z-20">
-        <h1 class="text-xl font-bold">BUMI PERKEMAHAN PLESERAN</h1>
+        <div>
+            <div class="bg-[#1e1b2e] text-white p-6 font-bold text-lg">
+                Bumi Perkemahan Pleseran
+            </div>
+
+            <div class="p-4 space-y-3">
+
+                <a href="/dashboard"
+                   class="flex items-center gap-3 px-4 py-2 hover:bg-gray-200 rounded-lg">
+                    🏠 Dashboard
+                </a>
+
+                <a href="/pemesanan"
+                   class="flex items-center gap-3 bg-black text-white px-4 py-2 rounded-lg">
+                    🎫 Pesan Tiket
+                </a>
+
+                <a href="/riwayat"
+                   class="flex items-center gap-3 px-4 py-2 hover:bg-gray-200 rounded-lg">
+                    📂 Riwayat Pesanan
+                </a>
+
+            </div>
+        </div>
+
+        <div class="p-4">
+            <form action="/logout" method="POST">
+                @csrf
+                <button class="flex items-center gap-2 text-gray-700 hover:text-red-500">
+                    🔙 Log Out
+                </button>
+            </form>
+        </div>
+
     </div>
 
-    <!-- CONTENT -->
-<div class="relative z-10 flex justify-center items-center min-h-screen px-5 pt-24">
 
-        <div class="bg-white w-full max-w-2xl p-8 rounded-2xl shadow-xl">
+    <!-- MAIN -->
+    <div class="flex-1 flex flex-col">
 
-            <h2 class="text-2xl font-semibold mb-6">
-                Pemesanan Tiket
-            </h2>
+        <!-- TOPBAR -->
+        <div class="bg-[#1e1b2e] text-white flex justify-end items-center px-6 py-4">
+            <span class="mr-3">Hallo, {{ auth()->user()->name }}</span>
+            <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+        </div>
 
-            <!-- NOTIF -->
-            @if(session('success'))
-                <div class="bg-green-500 text-white p-3 mb-4 rounded">
-                    ✅ {{ session('success') }}
-                </div>
-            @endif
 
-            <!-- ERROR -->
-            @if ($errors->any())
-                <div class="bg-red-100 text-red-600 p-3 mb-4 rounded">
-                    {{ $errors->first() }}
-                </div>
-            @endif
+        <!-- CONTENT -->
+        <div class="p-10 flex justify-center">
 
-            <form action="/pemesanan" method="POST" enctype="multipart/form-data">
-                @csrf
+            <div class="bg-white p-8 rounded-xl shadow w-full max-w-2xl">
 
-                <!-- PILIH TIKET -->
-                <div class="mb-4">
-                    <label class="block mb-1 font-medium">Pilih Tiket</label>
-                    <select name="tiket_id"
-                        class="w-full border rounded p-3">
+                <h2 class="text-xl font-bold mb-6">Pemesanan Tiket</h2>
 
-                        <option value="1">Tiket Camping - Rp 15.000</option>
-                        <option value="2">Tiket Masuk - Rp 10.000</option>
+                @if(session('success'))
+                    <div class="bg-green-500 text-white p-3 rounded mb-4">
+                        {{ session('success') }}
+                    </div>
+                @endif
 
-                    </select>
-                </div>
+                <form action="/pemesanan" method="POST" enctype="multipart/form-data">
+                    @csrf
 
-                <!-- JUMLAH -->
-                <div class="mb-4">
-                    <label class="block mb-1 font-medium">Jumlah Tiket</label>
-                    <input type="number" name="jumlah_tiket"
-                        min="1" value="1"
-                        class="w-full border rounded p-3" required>
-                </div>
+                    <!-- PILIH TIKET -->
+                    <div class="mb-4">
+                        <label class="block mb-1">Pilih Tiket</label>
+                        <select name="tiket_id" class="w-full border rounded-lg p-3">
+                            @foreach($tikets as $tiket)
+                                <option value="{{ $tiket->id }}">
+                                    {{ $tiket->nama_tiket }} - Rp {{ number_format($tiket->harga,0,',','.') }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                <!-- TANGGAL -->
-                <div class="mb-4">
-                    <label class="block mb-1 font-medium">Tanggal</label>
-                    <input type="date" name="tanggal"
-                        class="w-full border rounded p-3" required>
-                </div>
+                    <!-- JUMLAH -->
+                    <div class="mb-4">
+                        <label class="block mb-1">Jumlah Tiket</label>
+                        <input type="number" name="jumlah_tiket" min="1"
+                               class="w-full border rounded-lg p-3" required>
+                    </div>
 
-                <!-- BUKTI -->
-                <div class="mb-4">
-                    <label class="block mb-1 font-medium">Upload Bukti Pembayaran</label>
-                    <input type="file" name="bukti_pembayaran"
-                        class="w-full border rounded p-3">
-                </div>
+                    <!-- TANGGAL -->
+                    <div class="mb-4">
+                        <label class="block mb-1">Tanggal</label>
+                        <input type="date" name="tanggal"
+                               class="w-full border rounded-lg p-3" required>
+                    </div>
 
-                <!-- INFO -->
-                <p class="mb-4 text-sm text-gray-600">
-                    Untuk Payment Transfer ke BRI: <b>6718-0105-2339-535</b>
-                </p>
+                    <!-- UPLOAD -->
+                    <div class="mb-4">
+                        <label class="block mb-1">Upload Bukti Pembayaran</label>
+                        <input type="file" name="bukti_pembayaran"
+                               class="w-full border rounded-lg p-3">
+                    </div>
 
-                <!-- BUTTON -->
-                <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
-                    Pesan Sekarang
-                </button>
+                    <!-- INFO -->
+                    <p class="text-sm mb-4">
+                        UNTUK PAYMENT TRANSFER KE REKENING BRI 6718-0105-2339-535
+                    </p>
 
-            </form>
+                    <!-- BUTTON -->
+                    <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                        Pesan Sekarang
+                    </button>
+
+                </form>
+
+            </div>
 
         </div>
 

@@ -40,6 +40,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Invoice
     Route::get('/invoice/{id}', [PemesananController::class, 'invoice'])->name('invoice');
+    Route::get('/riwayat', [PemesananController::class, 'riwayat'])->name('riwayat');
 
 });
 
