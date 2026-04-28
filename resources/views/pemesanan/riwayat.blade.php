@@ -35,13 +35,6 @@
             </div>
         </div>
 
-        <div class="p-4">
-            <form action="/logout" method="POST">
-                @csrf
-                <button class="text-gray-700 hover:text-red-500">🔙 LogOut</button>
-            </form>
-        </div>
-
     </div>
 
     <!-- MAIN -->

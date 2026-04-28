@@ -38,14 +38,6 @@
             </div>
         </div>
 
-        <div class="p-4">
-            <form action="/logout" method="POST">
-                @csrf
-                <button class="flex items-center gap-2 text-gray-700 hover:text-red-500">
-                    🔙 Log Out
-                </button>
-            </form>
-        </div>
 
     </div>
 

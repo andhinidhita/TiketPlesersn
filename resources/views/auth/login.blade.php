@@ -2,83 +2,65 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Bumi Pleseran</title>
+    <title>Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
-<!-- BACKGROUND FULL -->
-<div class="relative h-screen">
+<body class="bg-gray-200">
 
-    <!-- IMAGE -->
-    <img src="{{ asset('images/bg.png') }}"
-         class="absolute w-full h-full object-cover">
+<!-- NAVBAR -->
+<div class="bg-[#1e1b2e] text-white px-10 py-5 font-bold text-lg">
+    BUMI PERKEMAHAN PLESERAN
+</div>
 
-    <!-- OVERLAY -->
-    <div class="absolute w-full h-full bg-black/40"></div>
+<!-- LOGIN CARD -->
+<div class="flex justify-center items-center h-[85vh]">
 
-    <!-- NAVBAR -->
-    <div class="absolute top-0 w-full bg-[#1e1b2e] text-white px-10 py-4">
-        <h1 class="text-xl font-bold">BUMI PERKEMAHAN PLESERAN</h1>
-    </div>
+    <div class="bg-white w-[500px] p-10 rounded-lg shadow-lg border">
 
-    <!-- CONTENT -->
-    <div class="relative z-10 flex items-center h-full px-20">
+        <h2 class="text-center text-2xl mb-10">Login</h2>
 
-        <!-- LOGIN CARD -->
-        <div class="bg-white p-10 rounded shadow-lg w-[400px]">
+        <!-- FORM -->
+        <form method="POST" action="{{ route('login') }}">
+            @csrf
 
-            <h1 class="text-2xl font-semibold mb-8 text-gray-700">
-                Login
-            </h1>
-
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
+            <div class="flex gap-6 mb-8">
 
                 <!-- EMAIL -->
-                <div class="mb-5">
-                    <label class="text-gray-600 text-sm">Username</label>
-                    <input type="email" name="email" required
-                        class="w-full p-3 bg-gray-200 rounded mt-1 outline-none">
+                <div class="w-1/2">
+                    <label class="block mb-2">Username</label>
+                    <input type="email" name="email"
+                        class="w-full bg-gray-300 p-2 rounded outline-none"
+                        required>
                 </div>
 
                 <!-- PASSWORD -->
-                <div class="mb-6">
-                    <label class="text-gray-600 text-sm">Password</label>
-                    <input type="password" name="password" required
-                        class="w-full p-3 bg-gray-200 rounded mt-1 outline-none">
+                <div class="w-1/2">
+                    <label class="block mb-2">Password</label>
+                    <input type="password" name="password"
+                        class="w-full bg-gray-300 p-2 rounded outline-none"
+                        required>
                 </div>
 
-                <!-- LOGIN BUTTON -->
-                <button class="w-full bg-[#1e1b2e] text-white py-3 rounded mb-4 hover:bg-black">
-                    Log in
-                </button>
+            </div>
 
-                <!-- TEXT -->
-                <p class="text-red-500 text-sm mb-4">
-                    Belum punya akun daftar sekarang!
-                </p>
+            <!-- BUTTON LOGIN -->
+            <button class="w-full bg-[#1e1b2e] text-white py-2 rounded mb-4 hover:opacity-90">
+                Log in
+            </button>
 
-                <!-- REGISTER -->
-                <a href="{{ route('register') }}">
-                    <button type="button"
-                        class="w-full bg-[#1e1b2e] text-white py-3 rounded hover:bg-black">
-                        Register
-                    </button>
-                </a>
+        </form>
 
-            </form>
-        </div>
+        <!-- REGISTER -->
+        <p class="text-center text-red-500 mb-3">
+            Belum punya akun daftar sekarang!
+        </p>
 
-        <!-- TEXT KANAN -->
-        <div class="ml-20 text-white max-w-lg">
-            <h1 class="text-4xl font-bold mb-2">
-                Bumi Perkemahan Pleseran
-            </h1>
-            <p class="text-lg">
-                Silahkan Login untuk liburan terbaik anda...
-            </p>
-        </div>
+        <a href="{{ route('register') }}">
+            <button class="w-full bg-[#1e1b2e] text-white py-2 rounded hover:opacity-90">
+                Register
+            </button>
+        </a>
 
     </div>
 
