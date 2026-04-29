@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
+            'role' => 'admin',
         ]);
 
         // 🔥 Panggil tiket seeder

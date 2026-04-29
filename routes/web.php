@@ -1,7 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PemesananController;
+use App\Http\Controllers\ProfileController;
+use App\Models\Pemesanan;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +22,8 @@ Route::get('/landing', function () {
     return view('landing');
 })->name('landing');
 
+Route::get('/admin/login', [AdminAuthController::class, 'create'])->name('admin.login');
+Route::post('/admin/login', [AdminAuthController::class, 'store'])->name('admin.login.store');
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +35,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        $userId = auth()->id();
+
+        return view('dashboard', [
+            'jumlahPesanan' => Pemesanan::where('user_id', $userId)->count(),
+            'jumlahTiket' => Pemesanan::where('user_id', $userId)->sum('jumlah_tiket'),
+            'statusTerakhir' => optional(Pemesanan::where('user_id', $userId)->latest()->first())->status ?? '-',
+        ]);
     })->name('dashboard');
 
     // Halaman Pemesanan
@@ -42,6 +54,23 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/invoice/{id}', [PemesananController::class, 'invoice'])->name('invoice');
     Route::get('/riwayat', [PemesananController::class, 'riwayat'])->name('riwayat');
 
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+});
+
+Route::middleware(['admin'])->group(function () {
+    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin/transaksi', [AdminController::class, 'transaksi'])->name('admin.transaksi');
+    Route::get('/admin/galeri', [AdminController::class, 'galeri'])->name('admin.galeri');
+    Route::get('/admin/tiket-wisata', [AdminController::class, 'tiket'])->name('admin.tiket');
+    Route::get('/admin/data-admin', [AdminController::class, 'admins'])->name('admin.admins');
+    Route::get('/admin/data-member', [AdminController::class, 'members'])->name('admin.members');
+    Route::get('/admin/transaksi/{pemesanan}/edit', [AdminController::class, 'editTransaksi'])->name('admin.transaksi.edit');
+    Route::patch('/admin/transaksi/{pemesanan}', [AdminController::class, 'updateTransaksi'])->name('admin.transaksi.update');
+    Route::delete('/admin/transaksi/{pemesanan}', [AdminController::class, 'destroyTransaksi'])->name('admin.transaksi.destroy');
+    Route::post('/admin/verifikasi/{id}', [AdminController::class, 'verifikasi'])->name('admin.verifikasi');
 });
 
 

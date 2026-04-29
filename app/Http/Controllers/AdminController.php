@@ -2,15 +2,121 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Pemesanan;
+use App\Models\Tiket;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function dashboard()
     {
-        $pemesanans = Pemesanan::with('tiket')->get();
-        return view('admin.index', compact('pemesanans'));
+        return view('admin.dashboard', [
+            'totalTransaksi' => Pemesanan::count(),
+            'transaksiPending' => Pemesanan::where('status', 'pending')->count(),
+            'transaksiLunas' => Pemesanan::where('status', 'lunas')->count(),
+            'totalMember' => User::where('role', 'user')->count(),
+            'totalAdmin' => User::where('role', 'admin')->count(),
+            'totalTiket' => Tiket::count(),
+            'pendapatanLunas' => Pemesanan::where('status', 'lunas')->sum('total_harga'),
+        ]);
+    }
+
+    public function transaksi()
+    {
+        $pemesanans = Pemesanan::with(['tiket', 'user'])->latest()->get();
+
+        return view('admin.transaksi', compact('pemesanans'));
+    }
+
+    public function editTransaksi(Pemesanan $pemesanan)
+    {
+        return view('admin.transaksi-edit', [
+            'pemesanan' => $pemesanan->load(['tiket', 'user']),
+            'tikets' => Tiket::orderBy('nama_tiket')->get(),
+        ]);
+    }
+
+    public function updateTransaksi(Request $request, Pemesanan $pemesanan)
+    {
+        $validated = $request->validate([
+            'tiket_id' => ['required', 'exists:tikets,id'],
+            'jumlah_tiket' => ['required', 'integer', 'min:1'],
+            'tanggal' => ['required', 'date'],
+            'status' => ['required', 'in:pending,lunas'],
+        ]);
+
+        DB::transaction(function () use ($pemesanan, $validated) {
+            $oldTiket = Tiket::whereKey($pemesanan->tiket_id)->lockForUpdate()->firstOrFail();
+            $newTiket = Tiket::whereKey($validated['tiket_id'])->lockForUpdate()->firstOrFail();
+
+            $oldTiket->increment('stok', $pemesanan->jumlah_tiket);
+
+            if ($validated['jumlah_tiket'] > $newTiket->stok) {
+                back()
+                    ->withErrors(['jumlah_tiket' => 'Stok tiket tidak mencukupi untuk perubahan ini.'])
+                    ->withInput()
+                    ->throwResponse();
+            }
+
+            $newTiket->decrement('stok', $validated['jumlah_tiket']);
+
+            $pemesanan->update([
+                'tiket_id' => $newTiket->id,
+                'jumlah_tiket' => $validated['jumlah_tiket'],
+                'tanggal' => $validated['tanggal'],
+                'total_harga' => $newTiket->harga * $validated['jumlah_tiket'],
+                'status' => $validated['status'],
+            ]);
+        });
+
+        return redirect()->route('admin.transaksi')->with('success', 'Transaksi berhasil diperbarui.');
+    }
+
+    public function destroyTransaksi(Pemesanan $pemesanan)
+    {
+        DB::transaction(function () use ($pemesanan) {
+            Tiket::whereKey($pemesanan->tiket_id)
+                ->lockForUpdate()
+                ->firstOrFail()
+                ->increment('stok', $pemesanan->jumlah_tiket);
+
+            $pemesanan->delete();
+        });
+
+        return redirect()->route('admin.transaksi')->with('success', 'Transaksi berhasil dihapus.');
+    }
+
+    public function galeri()
+    {
+        return view('admin.placeholder', [
+            'title' => 'Galeri',
+            'description' => 'Kelola foto landing page dan galeri wisata.',
+        ]);
+    }
+
+    public function tiket()
+    {
+        return view('admin.tiket', [
+            'tikets' => Tiket::orderBy('nama_tiket')->get(),
+        ]);
+    }
+
+    public function admins()
+    {
+        return view('admin.users', [
+            'title' => 'Data Admin',
+            'users' => User::where('role', 'admin')->latest()->get(),
+        ]);
+    }
+
+    public function members()
+    {
+        return view('admin.users', [
+            'title' => 'Data Member',
+            'users' => User::where('role', 'user')->latest()->get(),
+        ]);
     }
 
     public function verifikasi($id)

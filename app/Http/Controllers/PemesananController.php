@@ -2,56 +2,70 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Tiket;
 use App\Models\Pemesanan;
+use App\Models\Tiket;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class PemesananController extends Controller
 {
     public function index()
     {
-        $tikets = Tiket::all();
+        $tikets = Tiket::orderBy('nama_tiket')->get();
+
         return view('pemesanan.index', compact('tikets'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'tiket_id' => 'required|exists:tikets,id',
             'jumlah_tiket' => 'required|integer|min:1',
             'tanggal' => 'required|date',
-            'bukti_pembayaran' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'bukti_pembayaran' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-
-        $tiket = Tiket::findOrFail($request->tiket_id);
-        $total = $tiket->harga * $request->jumlah_tiket;
 
         $fileName = null;
 
         if ($request->hasFile('bukti_pembayaran')) {
             $file = $request->file('bukti_pembayaran');
-            $fileName = time() . '.' . $file->extension();
+            $fileName = Str::uuid() . '.' . $file->extension();
             $file->move(public_path('bukti'), $fileName);
         }
 
-        $pemesanan = Pemesanan::create([
-            'user_id' => Auth::id(),
-            'tiket_id' => $request->tiket_id,
-            'jumlah_tiket' => $request->jumlah_tiket,
-            'tanggal' => $request->tanggal, // ✅ FIX
-            'total_harga' => $total,
-            'bukti_pembayaran' => $fileName,
-            'status' => $fileName ? 'lunas' : 'pending'
-        ]);
+        $pemesanan = DB::transaction(function () use ($validated, $fileName) {
+            $tiket = Tiket::whereKey($validated['tiket_id'])->lockForUpdate()->firstOrFail();
 
-        return redirect('/invoice/' . $pemesanan->id);
+            if ($validated['jumlah_tiket'] > $tiket->stok) {
+                back()
+                    ->withErrors(['jumlah_tiket' => 'Stok tiket tidak mencukupi.'])
+                    ->withInput()
+                    ->throwResponse();
+            }
+
+            $tiket->decrement('stok', $validated['jumlah_tiket']);
+
+            return Pemesanan::create([
+                'user_id' => Auth::id(),
+                'tiket_id' => $tiket->id,
+                'jumlah_tiket' => $validated['jumlah_tiket'],
+                'tanggal' => $validated['tanggal'],
+                'total_harga' => $tiket->harga * $validated['jumlah_tiket'],
+                'bukti_pembayaran' => $fileName,
+                'status' => 'pending',
+            ]);
+        });
+
+        return redirect()->route('invoice', $pemesanan);
     }
 
     public function riwayat()
     {
-        $pemesanans = Pemesanan::with('tiket') // ✅ FIX
+        $pemesanans = Pemesanan::with('tiket')
             ->where('user_id', auth()->id())
+            ->latest()
             ->get();
 
         return view('pemesanan.riwayat', compact('pemesanans'));
@@ -59,7 +73,14 @@ class PemesananController extends Controller
 
     public function invoice($id)
     {
-        $pemesanan = Pemesanan::with('tiket', 'user')->findOrFail($id);
+        $query = Pemesanan::with('tiket', 'user')->whereKey($id);
+
+        if (auth()->user()->role !== 'admin') {
+            $query->where('user_id', auth()->id());
+        }
+
+        $pemesanan = $query->firstOrFail();
+
         return view('pemesanan.invoice', compact('pemesanan'));
     }
 }

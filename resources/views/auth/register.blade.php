@@ -2,78 +2,88 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Register - Bumi Perkemahan Pleseran</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+<body class="bg-slate-50 font-sans text-slate-900 antialiased">
+    <main class="min-h-screen lg:grid lg:grid-cols-[0.95fr_1.05fr]">
+        <section class="flex min-h-screen items-center justify-center px-5 py-10 sm:px-8">
+            <div class="w-full max-w-md">
+                <div class="mb-8 flex items-center justify-between">
+                    <a href="{{ route('landing') }}" class="font-bold text-slate-950">Bumi Perkemahan Pleseran</a>
+                    <a href="{{ route('login') }}" class="text-sm font-semibold text-slate-500 hover:text-slate-950">Login</a>
+                </div>
 
-<body class="bg-gray-200">
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                    <div>
+                        <p class="text-sm font-semibold uppercase tracking-wide text-emerald-700">Akun baru</p>
+                        <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950">Daftar</h2>
+                        <p class="mt-2 text-sm text-slate-500">Buat akun untuk mulai memesan tiket secara online.</p>
+                    </div>
 
-<!-- NAVBAR -->
-<div class="bg-[#1e1b2e] text-white px-10 py-5 font-bold text-lg">
-    BUMI PERKEMAHAN PLESERAN
-</div>
+                    @if ($errors->any())
+                        <div class="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                            {{ $errors->first() }}
+                        </div>
+                    @endif
 
-<!-- REGISTER CARD -->
-<div class="flex justify-center items-center h-[85vh]">
+                    <form method="POST" action="{{ route('register') }}" class="mt-8 space-y-5">
+                        @csrf
 
-    <div class="bg-white w-[500px] p-10 rounded-lg shadow-lg border">
+                        <div>
+                            <label for="name" class="block text-sm font-semibold text-slate-700">Nama Lengkap</label>
+                            <input id="name" type="text" name="name" value="{{ old('name') }}" autocomplete="name"
+                                   class="mt-2 w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600" required autofocus>
+                        </div>
 
-        <h2 class="text-2xl mb-8">Register</h2>
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-slate-700">Email</label>
+                            <input id="email" type="email" name="email" value="{{ old('email') }}" autocomplete="username"
+                                   class="mt-2 w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600" required>
+                        </div>
 
-        <!-- FORM -->
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
+                        <div>
+                            <label for="password" class="block text-sm font-semibold text-slate-700">Password</label>
+                            <input id="password" type="password" name="password" autocomplete="new-password"
+                                   class="mt-2 w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600" required>
+                        </div>
 
-            <!-- NAMA -->
-            <div class="mb-5">
-                <label class="block mb-2">Nama</label>
-                <input type="text" name="name"
-                    class="w-full bg-gray-200 p-3 rounded outline-none"
-                    required>
+                        <div>
+                            <label for="password_confirmation" class="block text-sm font-semibold text-slate-700">Konfirmasi Password</label>
+                            <input id="password_confirmation" type="password" name="password_confirmation" autocomplete="new-password"
+                                   class="mt-2 w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600" required>
+                        </div>
+
+                        <button class="w-full rounded-md bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800">
+                            Buat Akun
+                        </button>
+                    </form>
+
+                    <p class="mt-6 text-center text-sm text-slate-500">
+                        Sudah punya akun?
+                        <a href="{{ route('login') }}" class="font-semibold text-emerald-700 hover:text-emerald-800">Masuk</a>
+                    </p>
+                </div>
             </div>
+        </section>
 
-            <!-- EMAIL -->
-            <div class="mb-5">
-                <label class="block mb-2">Email</label>
-                <input type="email" name="email"
-                    class="w-full bg-gray-300 p-3 rounded outline-none"
-                    required>
+        <section class="relative hidden overflow-hidden lg:block">
+            <img src="{{ asset('images/g5.png') }}" alt="Area camping Pleseran" class="absolute inset-0 h-full w-full object-cover">
+            <div class="absolute inset-0 bg-slate-950/45"></div>
+            <div class="relative z-10 flex min-h-screen items-end p-10 text-white">
+                <div class="max-w-xl">
+                    <p class="text-sm font-semibold uppercase tracking-wide text-emerald-200">Mulai dari sini</p>
+                    <h1 class="mt-4 text-5xl font-extrabold tracking-tight">Akunmu untuk semua pemesanan Pleseran.</h1>
+                    <p class="mt-5 text-base leading-7 text-white/80">
+                        Setelah daftar, kamu bisa langsung masuk dashboard, membuat pesanan, dan menyimpan riwayat invoice.
+                    </p>
+                </div>
             </div>
-
-            <!-- PASSWORD -->
-            <div class="mb-5">
-                <label class="block mb-2">Password</label>
-                <input type="password" name="password"
-                    class="w-full bg-gray-300 p-3 rounded outline-none"
-                    required>
-            </div>
-
-            <!-- KONFIRMASI PASSWORD -->
-            <div class="mb-6">
-                <label class="block mb-2">Konfirmasi Password</label>
-                <input type="password" name="password_confirmation"
-                    class="w-full bg-gray-200 p-3 rounded outline-none"
-                    required>
-            </div>
-
-            <!-- BUTTON -->
-            <button class="w-full bg-[#1e1b2e] text-white py-3 rounded hover:opacity-90">
-                Register
-            </button>
-
-        </form>
-
-        <!-- LOGIN LINK -->
-        <p class="text-center mt-4 text-sm">
-            Sudah Punya akun?
-            <a href="{{ route('login') }}" class="text-blue-600 hover:underline">
-                Login
-            </a>
-        </p>
-
-    </div>
-
-</div>
-
+        </section>
+    </main>
 </body>
 </html>

@@ -1,117 +1,66 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Riwayat Pesanan</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+@extends('layouts.user')
 
-<body class="bg-gray-100">
+@section('title', 'Riwayat Pesanan - Bumi Perkemahan Pleseran')
+@section('page_title', 'Riwayat Pesanan')
 
-<div class="flex h-screen">
+@section('header_action')
+    <a href="{{ route('pemesanan') }}" class="rounded-md bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800">
+        Pesan Lagi
+    </a>
+@endsection
 
-    <!-- SIDEBAR -->
-    <div class="w-64 bg-gray-100 border-r flex flex-col justify-between">
-
-        <div>
-            <div class="bg-[#1e1b2e] text-white p-6 font-bold text-lg">
-                Bumi Perkemahan Pleseran
-            </div>
-
-            <div class="p-4 space-y-3">
-
-                <a href="/dashboard" class="flex gap-3 px-4 py-2 hover:bg-gray-200 rounded">
-                    🏠 Dashboard
-                </a>
-
-                <a href="/pemesanan" class="flex gap-3 px-4 py-2 hover:bg-gray-200 rounded">
-                    🎫 Pesan Tiket
-                </a>
-
-                <a href="/riwayat" class="flex gap-3 px-4 py-2 bg-black text-white rounded">
-                    📂 Riwayat Pesanan
-                </a>
-
-            </div>
-        </div>
-
-    </div>
-
-    <!-- MAIN -->
-    <div class="flex-1 flex flex-col">
-
-        <!-- TOPBAR -->
-        <div class="bg-[#1e1b2e] text-white flex justify-end items-center px-6 py-4">
-            Hallo, {{ auth()->user()->name }}
-        </div>
-
-        <!-- CONTENT -->
-        <div class="p-10 flex justify-center">
-
-            <div class="bg-white p-8 rounded-xl shadow w-full max-w-5xl">
-
-                <h2 class="text-xl font-bold mb-6">Riwayat Pemesanan</h2>
-
-                <div class="border rounded-lg overflow-hidden">
-
-                    <!-- HEADER -->
-                    <div class="grid grid-cols-6 bg-gray-200 p-4 font-semibold text-sm">
-                        <div>Tanggal Booking</div>
-                        <div>Tiket</div>
-                        <div>Harga</div>
-                        <div>Jumlah</div>
-                        <div>Total</div>
-                        <div>Status</div>
-                    </div>
-
-                    <!-- DATA -->
+@section('content')
+    <div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Tanggal</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Tiket</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Harga</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Jumlah</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Total</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+                        <th class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Invoice</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     @forelse($pemesanans as $pemesanan)
-                    <div class="grid grid-cols-6 p-4 border-t text-sm items-center">
-
-                        <div>
-                            {{ \Carbon\Carbon::parse($pemesanan->tanggal)->format('d-m-Y') }}
-                        </div>
-
-                        <div>
-                            {{ $pemesanan->tiket->nama_tiket }}
-                        </div>
-
-                        <div>
-                            Rp {{ number_format($pemesanan->tiket->harga,0,',','.') }}
-                        </div>
-
-                        <div>
-                            {{ $pemesanan->jumlah_tiket }}
-                        </div>
-
-                        <div>
-                            Rp {{ number_format($pemesanan->total_harga,0,',','.') }}
-                        </div>
-
-                        <div>
-                            <span class="{{ $pemesanan->status == 'lunas' ? 'text-green-600' : 'text-yellow-500' }}">
-                                {{ $pemesanan->status }}
-                            </span>
-                        </div>
-
-                    </div>
+                        <tr class="hover:bg-slate-50">
+                            <td class="whitespace-nowrap px-5 py-4 text-sm text-slate-600">
+                                {{ optional($pemesanan->tanggal)->format('d M Y') ?? '-' }}
+                            </td>
+                            <td class="px-5 py-4 text-sm font-semibold text-slate-950">
+                                {{ $pemesanan->tiket->nama_tiket }}
+                            </td>
+                            <td class="whitespace-nowrap px-5 py-4 text-sm text-slate-600">
+                                Rp {{ number_format($pemesanan->tiket->harga,0,',','.') }}
+                            </td>
+                            <td class="whitespace-nowrap px-5 py-4 text-sm text-slate-600">
+                                {{ $pemesanan->jumlah_tiket }}
+                            </td>
+                            <td class="whitespace-nowrap px-5 py-4 text-sm font-semibold text-slate-950">
+                                Rp {{ number_format($pemesanan->total_harga,0,',','.') }}
+                            </td>
+                            <td class="whitespace-nowrap px-5 py-4 text-sm">
+                                <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $pemesanan->status == 'lunas' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">
+                                    {{ ucfirst($pemesanan->status) }}
+                                </span>
+                            </td>
+                            <td class="whitespace-nowrap px-5 py-4 text-right text-sm">
+                                <a href="{{ route('invoice', $pemesanan) }}" class="font-semibold text-emerald-700 hover:text-emerald-800">Lihat</a>
+                            </td>
+                        </tr>
                     @empty
-
-                    <div class="p-6 text-center text-gray-500">
-                        Belum ada pesanan
-                    </div>
-
+                        <tr>
+                            <td colspan="7" class="px-5 py-12 text-center">
+                                <p class="text-sm font-semibold text-slate-950">Belum ada pesanan</p>
+                                <p class="mt-1 text-sm text-slate-500">Pesanan yang kamu buat akan muncul di sini.</p>
+                            </td>
+                        </tr>
                     @endforelse
-
-                </div>
-
-            </div>
-
+                </tbody>
+            </table>
         </div>
-
     </div>
-
-</div>
-
-</body>
-</html>
+@endsection

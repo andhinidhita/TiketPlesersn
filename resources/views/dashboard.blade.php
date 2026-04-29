@@ -1,105 +1,99 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+@extends('layouts.user')
 
-<body class="bg-gray-100">
+@section('title', 'Dashboard - Bumi Perkemahan Pleseran')
 
-<div class="flex h-screen">
-
-    <!-- SIDEBAR -->
-    <div class="w-64 bg-gray-100 border-r flex flex-col justify-between">
-
-        <!-- TOP SIDEBAR -->
-        <div>
-            <div class="bg-[#1e1b2e] text-white p-6 font-bold text-lg">
-                Bumi Perkemahan Pleseran
+@section('content')
+    <section class="overflow-hidden rounded-lg bg-slate-950 shadow-sm">
+        <div class="grid lg:grid-cols-[1.05fr_0.95fr]">
+            <div class="p-6 text-white sm:p-10">
+                <p class="text-sm font-semibold uppercase tracking-wide text-emerald-200">Halo, {{ auth()->user()->name }}</p>
+                <h1 class="mt-4 max-w-2xl text-3xl font-extrabold tracking-tight sm:text-5xl">
+                    Mau camping kapan?
+                </h1>
+                <p class="mt-5 max-w-2xl leading-7 text-white/75">
+                    Dari sini kamu bisa pesan tiket, cek status pembayaran Bumi Perkemahan Pleseran.
+                </p>
+                <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                    <a href="{{ route('pemesanan') }}" class="inline-flex items-center justify-center rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700">
+                        Pesan Tiket
+                    </a>
+                    <a href="{{ route('riwayat') }}" class="inline-flex items-center justify-center rounded-md border border-white/30 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10">
+                        Lihat Riwayat
+                    </a>
+                </div>
             </div>
+            <img src="{{ asset('images/g3.png') }}" alt="Area camping Pleseran" class="h-72 w-full object-cover lg:h-full">
+        </div>
+    </section>
 
-            <div class="p-4 space-y-3">
-
-                <!-- DASHBOARD -->
-                <a href="/dashboard"
-                   class="flex items-center gap-3 bg-black text-white px-4 py-2 rounded-lg">
-                    🏠 Dashboard
-                </a>
-
-                <!-- PESAN -->
-                <a href="/pemesanan"
-                   class="flex items-center gap-3 px-4 py-2 hover:bg-gray-200 rounded-lg">
-                    🎫 Pesan Tiket
-                </a>
-
-                <!-- RIWAYAT -->
-                <a href="/riwayat"
-                   class="flex items-center gap-3 px-4 py-2 hover:bg-gray-200 rounded-lg">
-                    📂 Riwayat Pesanan
-                </a>
-
+    <section class="mt-6 grid gap-5 md:grid-cols-3">
+        <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <p class="text-sm font-semibold text-slate-500">Pesanan Kamu</p>
+            <div class="mt-4 flex items-end justify-between">
+                <p class="text-4xl font-extrabold text-slate-950">{{ $jumlahPesanan }}</p>
+                <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Order</span>
             </div>
         </div>
 
-        <!-- LOGOUT -->
-        <div class="p-4">
-            <form action="/logout" method="POST">
-                @csrf
-                <button class="flex items-center gap-2 text-gray-700 hover:text-red-500">
-                    🔙 Log Out
-                </button>
-            </form>
-        </div>
-
-    </div>
-
-
-    <!-- MAIN CONTENT -->
-    <div class="flex-1 flex flex-col">
-
-        <!-- TOPBAR -->
-        <div class="bg-[#1e1b2e] text-white flex justify-end items-center px-6 py-4">
-            <span class="mr-3">Hallo, {{ auth()->user()->name }}</span>
-            <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
-        </div>
-
-        <!-- CONTENT -->
-        <div class="p-10">
-
-            <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
-
-            <!-- CARD -->
-            <div class="grid md:grid-cols-3 gap-6">
-
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <p class="text-gray-500">Pesanan Saya</p>
-                    <h1 class="text-3xl font-bold">
-                        {{ \App\Models\Pemesanan::where('user_id', auth()->id())->count() }}
-                    </h1>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <p class="text-gray-500">Tiket Saya</p>
-                    <h1 class="text-3xl font-bold">
-                        {{ \App\Models\Pemesanan::where('user_id', auth()->id())->sum('jumlah_tiket') }}
-                    </h1>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <p class="text-gray-500">Status Terakhir</p>
-                    <h1 class="text-lg font-semibold text-green-600">
-                        {{ optional(\App\Models\Pemesanan::where('user_id', auth()->id())->latest()->first())->status ?? '-' }}
-                    </h1>
-                </div>
-
+        <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <p class="text-sm font-semibold text-slate-500">Total Tiket</p>
+            <div class="mt-4 flex items-end justify-between">
+                <p class="text-4xl font-extrabold text-slate-950">{{ $jumlahTiket }}</p>
+                <span class="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">Tiket</span>
             </div>
-
         </div>
 
-    </div>
+        <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <p class="text-sm font-semibold text-slate-500">Pesanan Terakhir</p>
+            <div class="mt-4 flex items-end justify-between">
+                <p class="text-2xl font-extrabold {{ $statusTerakhir === 'lunas' ? 'text-emerald-700' : 'text-amber-600' }}">
+                    {{ ucfirst($statusTerakhir) }}
+                </p>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Status</span>
+            </div>
+        </div>
+    </section>
 
-</div>
+    <section class="mt-6 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+        <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <p class="text-sm font-semibold uppercase tracking-wide text-emerald-700">Panduan Singkat</p>
+            <h2 class="mt-2 text-xl font-bold text-slate-950">Cara pesan tiket</h2>
+            <div class="mt-5 space-y-4">
+                <div class="flex gap-3">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-bold text-emerald-700">1</span>
+                    <div>
+                        <p class="font-semibold text-slate-950">Isi data pesanan</p>
+                        <p class="mt-1 text-sm text-slate-500">Pilih tiket, tanggal kunjungan, dan jumlah tiket.</p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-bold text-emerald-700">2</span>
+                    <div>
+                        <p class="font-semibold text-slate-950">Upload bukti pembayaran</p>
+                        <p class="mt-1 text-sm text-slate-500">Transfer ke rekening yang tersedia, lalu unggah bukti.</p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-bold text-emerald-700">3</span>
+                    <div>
+                        <p class="font-semibold text-slate-950">Tunggu verifikasi</p>
+                        <p class="mt-1 text-sm text-slate-500">Admin akan mengecek pembayaran sebelum status menjadi lunas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-</body>
-</html>
+        <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-wide text-emerald-700">Rekening Pembayaran</p>
+                    <h2 class="mt-2 text-xl font-bold text-slate-950">BRI 6718-0105-2339-535</h2>
+                    <p class="mt-2 text-sm text-slate-500">Gunakan nominal sesuai invoice agar mudah diverifikasi.</p>
+                </div>
+                <a href="{{ route('pemesanan') }}" class="inline-flex items-center justify-center rounded-md bg-emerald-700 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-800">
+                    Buat Pesanan
+                </a>
+            </div>
+        </div>
+    </section>
+@endsection

@@ -2,180 +2,125 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bumi Perkemahan Pleseran</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-
-<body class="bg-gray-100">
-
-<!-- ================= NAVBAR ================= -->
-<nav class="fixed w-full z-50 bg-[#1e1b2e] text-white px-10 py-4 flex justify-between items-center">
-    <h1 class="font-bold text-lg">BUMI PERKEMAHAN PLESERAN</h1>
-
-    <ul class="flex gap-6 text-sm items-center">
-        <li><a href="#" class="hover:text-gray-300">Home</a></li>
-        <li><a href="#about" class="hover:text-gray-300">About</a></li>
-        <li><a href="#galeri" class="hover:text-gray-300">Galeri</a></li>
-        <li><a href="#contact" class="hover:text-gray-300">Contact</a></li>
-        <li>
-            <a href="/login" class="border px-4 py-1 rounded-full hover:bg-white hover:text-black">
+<body class="bg-white font-sans text-slate-900 antialiased">
+    <nav class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-slate-950/85 px-5 py-4 text-white backdrop-blur sm:px-8">
+        <div class="mx-auto flex max-w-7xl items-center justify-between">
+            <a href="{{ route('landing') }}" class="font-bold tracking-tight">Bumi Perkemahan Pleseran</a>
+            <div class="hidden items-center gap-6 text-sm font-medium md:flex">
+                <a href="#about" class="text-white/80 hover:text-white">Tentang</a>
+                <a href="#galeri" class="text-white/80 hover:text-white">Galeri</a>
+                <a href="#contact" class="text-white/80 hover:text-white">Kontak</a>
+            </div>
+            <a href="{{ route('login') }}" class="rounded-md bg-white px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-slate-100">
                 Login
             </a>
-        </li>
-    </ul>
-</nav>
-
-
-<!-- ================= HERO ================= -->
-<section class="h-screen relative">
-
-    <img src="{{ asset('images/bg.png') }}"
-         class="absolute w-full h-full object-cover">
-
-    <!-- overlay gradient -->
-    <div class="absolute w-full h-full bg-gradient-to-r from-black/40 to-transparent"></div>
-
-    <div class="relative z-10 h-full flex items-end px-16 pb-20 text-white">
-
-        <div class="max-w-lg">
-
-            <p class="text-sm leading-relaxed bg-black/30 p-4 rounded-lg">
-                Buat kalian yang mau camping di pinggir sungai dengan background air terjun 
-                dan telaga, inilah tempatnya...
-            </p>
-
         </div>
+    </nav>
 
-    </div>
-
-</section>
-
-
-<!-- ================= ABOUT ================= -->
-<section id="about" class="py-20 px-6 bg-gradient-to-r from-gray-100 to-gray-200">
-
-    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-8 grid md:grid-cols-2 gap-10 items-center">
-
-        <!-- IMAGE -->
-        <img src="{{ asset('images/about.png') }}" 
-             class="rounded-xl shadow-md w-full object-cover">
-
-        <!-- TEXT -->
-        <div>
-            <h2 class="text-2xl font-bold mb-4 text-[#1e1b2e]">
-                BUMI PERKEMAHAN PLESERAN
-            </h2>
-
-            <p class="text-gray-600 mb-4 leading-relaxed">
-                Bumi Perkemahan (Buper) Pleseran ini berada di area hutan lindung wilayah Perhutani KPH Surakarta. Tepatnya di Jalan Candi Menggung, Desa Nglurah, Area Hutan Lindung, Tawangmangu, Kabupaten KaranganyarTempat camping sekaligus wisata alam ini yang memiliki luas 2,5 hektare ini sudah dikelola sejak tahun 2016 lalu.Namun hingga saat ini, Bumi Perkemahan Pleseran masih menjadi pilihan untuk para wisatawan.
-            </p>
-
-            <p class="text-gray-600 leading-relaxed">
-                Selain menjadi tempat camping favorit, di Bumi Perkemahan Pleseran menyuguhkan permainan outbond, seperti flying fox, kemudian bermain di sungai dan Telogo Asmoro, lalu memberi makan burung.
-            </p>
-
-            <!-- BUTTON BIAR GA KOSONG -->
-            <a href="#galeri"
-               class="inline-block mt-6 bg-[#1e1b2e] text-white px-6 py-2 rounded-lg hover:bg-black transition">
-               Lihat Galeri →
-            </a>
+    <header class="relative min-h-[88vh] overflow-hidden">
+        <img src="{{ asset('images/bg.png') }}" alt="Bumi Perkemahan Pleseran" class="absolute inset-0 h-full w-full object-cover">
+        <div class="absolute inset-0 bg-slate-950/45"></div>
+        <div class="relative z-10 mx-auto flex min-h-[88vh] max-w-7xl items-end px-5 pb-16 pt-28 sm:px-8">
+            <div class="max-w-3xl text-white">
+                <p class="text-sm font-semibold uppercase tracking-wide text-emerald-200">Tawangmangu, Karanganyar</p>
+                <h1 class="mt-4 text-4xl font-extrabold tracking-tight sm:text-6xl">Bumi Perkemahan Pleseran</h1>
+                <p class="mt-5 max-w-2xl text-base leading-7 text-white/85 sm:text-lg">
+                    Area camping dan wisata alam dengan suasana hutan, aliran sungai, dan udara pegunungan yang cocok untuk liburan keluarga maupun kegiatan komunitas.
+                </p>
+                <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                    <a href="{{ auth()->check() ? route('pemesanan') : route('login') }}" class="inline-flex items-center justify-center rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700">
+                        Pesan Tiket
+                    </a>
+                    <a href="#galeri" class="inline-flex items-center justify-center rounded-md border border-white/40 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10">
+                        Lihat Galeri
+                    </a>
+                </div>
+            </div>
         </div>
+    </header>
 
-    </div>
-
-</section>
-
-
-<!-- ================= GALERI ================= -->
-<section id="galeri" class="py-20 px-10 bg-white">
-
-    <h2 class="text-center text-2xl font-bold mb-10">
-        GALERI BUPER PLESERAN
-    </h2>
-
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
-
-        <img src="{{ asset('images/g1.png') }}" class="rounded-lg shadow-md hover:scale-105 transition">
-        <img src="{{ asset('images/g2.png') }}" class="rounded-lg shadow-md hover:scale-105 transition">
-        <img src="{{ asset('images/g3.png') }}" class="rounded-lg shadow-md hover:scale-105 transition">
-        <img src="{{ asset('images/g4.png') }}" class="rounded-lg shadow-md hover:scale-105 transition">
-
-    </div>
-
-    <div class="text-center mt-8">
-        <a href="#" class="text-blue-600 hover:underline">
-            Lihat Semua →
-        </a>
-    </div>
-
-</section>
-
-
-<!-- ================= CTA ================= -->
-<section class="py-20 bg-gray-100">
-
-    <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center px-6">
-
-        <!-- TEXT -->
-        <div class="bg-white p-8 rounded-2xl shadow-lg">
-
-            <p class="text-sm text-gray-500 mb-2">
-                BUMI PERKEMAHAN PLESERAN
-            </p>
-
-            <h2 class="text-2xl font-bold mb-4 leading-snug">
-                Pilihan wisata terbaik agar liburan akhir pekanmu jadi semakin asik.
-            </h2>
-
-            <p class="text-gray-600 mb-6">
-                Dapatkan pengalaman berkemah yang berkesan di tempat kami. 
-                Nikmati udara segar pegunungan, ciptakan momen kebersamaan, 
-                dan biarkan suara gemericik sungai menyambutmu setiap pagi.
-            </p>
-
-            <!-- BUTTON -->
-            <a href="/pemesanan"
-               class="bg-[#1e1b2e] text-white px-6 py-2 rounded-lg hover:bg-black transition">
-               Pesan Sekarang →
-            </a>
-
+    <section id="about" class="px-5 py-16 sm:px-8">
+        <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-center">
+            <img src="{{ asset('images/about.png') }}" alt="Area wisata Pleseran" class="h-full max-h-[460px] w-full rounded-lg object-cover shadow-sm">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-wide text-emerald-700">Tentang Lokasi</p>
+                <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-950">Wisata alam yang tenang dan mudah diakses.</h2>
+                <p class="mt-5 leading-7 text-slate-600">
+                    Bumi Perkemahan Pleseran berada di kawasan Tawangmangu, Karanganyar. Tempat ini dikenal sebagai area camping dan wisata alam dengan suasana yang sejuk, cocok untuk berkemah, berkumpul, dan menikmati waktu di luar ruangan.
+                </p>
+                <div class="mt-8 grid gap-4 sm:grid-cols-3">
+                    <div class="rounded-lg border border-slate-200 p-4">
+                        <p class="text-2xl font-bold text-slate-950">2.5 ha</p>
+                        <p class="mt-1 text-sm text-slate-500">Area wisata</p>
+                    </div>
+                    <div class="rounded-lg border border-slate-200 p-4">
+                        <p class="text-2xl font-bold text-slate-950">2016</p>
+                        <p class="mt-1 text-sm text-slate-500">Mulai dikelola</p>
+                    </div>
+                    <div class="rounded-lg border border-slate-200 p-4">
+                        <p class="text-2xl font-bold text-slate-950">24/7</p>
+                        <p class="mt-1 text-sm text-slate-500">Camping area</p>
+                    </div>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <!-- IMAGE -->
-        <div class="relative">
+    <section id="galeri" class="bg-slate-50 px-5 py-16 sm:px-8">
+        <div class="mx-auto max-w-7xl">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-wide text-emerald-700">Galeri</p>
+                    <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-950">Suasana Pleseran</h2>
+                </div>
+                <a href="{{ auth()->check() ? route('pemesanan') : route('login') }}" class="text-sm font-semibold text-emerald-700 hover:text-emerald-800">Pesan tiket sekarang</a>
+            </div>
 
-            <img src="{{ asset('images/g5.png') }}"
-                 class="rounded-2xl shadow-lg w-full object-cover">
-
-            <!-- overlay kecil biar ga flat -->
-            <div class="absolute inset-0 bg-black/10 rounded-2xl"></div>
-
+            <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <img src="{{ asset('images/g1.png') }}" alt="Galeri Pleseran 1" class="aspect-[4/3] w-full rounded-lg object-cover shadow-sm">
+                <img src="{{ asset('images/g2.png') }}" alt="Galeri Pleseran 2" class="aspect-[4/3] w-full rounded-lg object-cover shadow-sm">
+                <img src="{{ asset('images/g3.png') }}" alt="Galeri Pleseran 3" class="aspect-[4/3] w-full rounded-lg object-cover shadow-sm">
+                <img src="{{ asset('images/g4.png') }}" alt="Galeri Pleseran 4" class="aspect-[4/3] w-full rounded-lg object-cover shadow-sm">
+            </div>
         </div>
+    </section>
 
-    </div>
+    <section class="px-5 py-16 sm:px-8">
+        <div class="mx-auto grid max-w-7xl gap-8 rounded-lg bg-slate-950 p-6 text-white sm:p-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-wide text-emerald-200">Reservasi Online</p>
+                <h2 class="mt-3 text-3xl font-bold tracking-tight">Pesan tiket tanpa harus antre di lokasi.</h2>
+                <p class="mt-4 leading-7 text-white/75">Pilih tiket, isi tanggal kunjungan, unggah bukti pembayaran, lalu tunggu admin memverifikasi pesananmu.</p>
+                <a href="{{ auth()->check() ? route('pemesanan') : route('login') }}" class="mt-7 inline-flex rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700">
+                    Mulai Pesan
+                </a>
+            </div>
+            <img src="{{ asset('images/g5.png') }}" alt="Area camping Pleseran" class="aspect-[4/3] w-full rounded-lg object-cover">
+        </div>
+    </section>
 
-</section>
-
-<!-- ================= FOOTER ================= -->
-<section id="contact" class="bg-[#1e1b2e] text-white py-10 px-10">
-
-    <h2 class="text-xl font-bold mb-4">
-        BUMI PERKEMAHAN PLESERAN
-    </h2>
-
-    <p class="mb-2">
-         📍 Jalan Candi Menggung Nglurah, Area Hutan, Tawangmangu, Karanganyar Regency, Central Java 57792
-    </p>
-
-    <p class="mb-2">
-         📞 WA: 0812-2637-1995
-    </p>
-
-    <p>
-         ✉️ Email: BuperPleseran@gmail.com
-    </p>
-
-</section>
-
+    <footer id="contact" class="border-t border-slate-200 bg-white px-5 py-10 sm:px-8">
+        <div class="mx-auto grid max-w-7xl gap-6 text-sm text-slate-600 md:grid-cols-3">
+            <div>
+                <p class="font-bold text-slate-950">Bumi Perkemahan Pleseran</p>
+                <p class="mt-2">Jalan Candi Menggung Nglurah, Area Hutan, Tawangmangu, Karanganyar Regency, Central Java 57792.</p>
+            </div>
+            <div>
+                <p class="font-semibold text-slate-950">Kontak</p>
+                <p class="mt-2">WA: 0812-2637-1995</p>
+                <p>Email: BuperPleseran@gmail.com</p>
+            </div>
+            <div class="md:text-right">
+                <p class="font-semibold text-slate-950">Layanan</p>
+                <p class="mt-2">Tiket masuk dan camping area.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
