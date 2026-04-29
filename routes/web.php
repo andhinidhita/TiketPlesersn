@@ -73,6 +73,8 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/admin/verifikasi/{id}', [AdminController::class, 'verifikasi'])->name('admin.verifikasi');
 });
 
+Route::post('/midtrans/callback', [PemesananController::class, 'callback']);
+
 
 /*
 |--------------------------------------------------------------------------
