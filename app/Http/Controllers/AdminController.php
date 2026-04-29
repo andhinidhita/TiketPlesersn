@@ -103,6 +103,49 @@ class AdminController extends Controller
         ]);
     }
 
+    public function storeTiket(Request $request)
+    {
+        // 1. Validasi input dari form modal
+        $validated = $request->validate([
+            'nama_tiket' => 'required|string|max:255',
+            'harga' => 'required|numeric|min:0',
+            'stok' => 'required|integer|min:0',
+        ]);
+
+        // 2. Simpan data ke database
+        Tiket::create($validated);
+
+        // 3. Kembali ke halaman sebelumnya dengan pesan sukses
+        return back()->with('success', 'Tiket wisata berhasil ditambahkan.');
+    }
+
+    public function updateTiket(Request $request, $id)
+    {
+        // 1. Validasi input
+        $validated = $request->validate([
+            'nama_tiket' => 'required|string|max:255',
+            'harga' => 'required|numeric|min:0',
+            'stok' => 'required|integer|min:0',
+        ]);
+
+        // 2. Cari tiket dan update
+        $tiket = Tiket::findOrFail($id);
+        $tiket->update($validated);
+
+        // 3. Kembali dengan pesan sukses
+        return back()->with('success', 'Data tiket berhasil diperbarui.');
+    }
+
+    public function destroyTiket($id)
+    {
+        // 1. Cari tiket dan hapus
+        $tiket = Tiket::findOrFail($id);
+        $tiket->delete();
+
+        // 2. Kembali dengan pesan sukses
+        return back()->with('success', 'Tiket wisata berhasil dihapus.');
+    }
+
     public function admins()
     {
         return view('admin.users', [

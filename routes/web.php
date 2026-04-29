@@ -65,6 +65,9 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/admin/transaksi', [AdminController::class, 'transaksi'])->name('admin.transaksi');
     Route::get('/admin/galeri', [AdminController::class, 'galeri'])->name('admin.galeri');
     Route::get('/admin/tiket-wisata', [AdminController::class, 'tiket'])->name('admin.tiket');
+    Route::post('/admin/tiket-wisata', [AdminController::class, 'storeTiket'])->name('admin.tiket.store');
+    Route::put('/admin/tiket-wisata/{id}', [AdminController::class, 'updateTiket'])->name('admin.tiket.update');
+    Route::delete('/admin/tiket-wisata/{id}', [AdminController::class, 'destroyTiket'])->name('admin.tiket.destroy');
     Route::get('/admin/data-admin', [AdminController::class, 'admins'])->name('admin.admins');
     Route::get('/admin/data-member', [AdminController::class, 'members'])->name('admin.members');
     Route::get('/admin/transaksi/{pemesanan}/edit', [AdminController::class, 'editTransaksi'])->name('admin.transaksi.edit');

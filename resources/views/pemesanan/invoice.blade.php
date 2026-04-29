@@ -96,7 +96,7 @@
         </section>
     </main>
 
-    <div id="success-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/50 backdrop-blur-sm transition-opacity">
+    <div id="success-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm transition-opacity">
         <div class="relative w-full max-w-sm scale-100 rounded-xl bg-white p-6 text-center shadow-2xl transition-transform sm:p-8">
             
             <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
@@ -125,6 +125,7 @@
                 onSuccess: function(result){
                     // 1. Munculkan Modal Keren kita (Hapus class 'hidden')
                     successModal.classList.remove('hidden');
+                    successModal.classList.add('flex');
 
                     // 2. Jika tombol "Lihat Tiket Saya" diklik, arahkan ke riwayat
                     btnLihatTiket.addEventListener('click', function() {
