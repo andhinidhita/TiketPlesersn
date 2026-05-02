@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Galeri;
 use App\Models\Pemesanan;
 use App\Models\Tiket;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -88,12 +90,47 @@ class AdminController extends Controller
         return redirect()->route('admin.transaksi')->with('success', 'Transaksi berhasil dihapus.');
     }
 
+    // Ubah fungsi galeri() yang lama menjadi ini:
     public function galeri()
     {
-        return view('admin.placeholder', [
-            'title' => 'Galeri',
-            'description' => 'Kelola foto landing page dan galeri wisata.',
+        return view('admin.galeri', [
+            'galeris' => Galeri::latest()->get(), // Mengambil data foto terbaru
         ]);
+    }
+
+    // Tambahkan fungsi untuk SIMPAN FOTO
+    public function storeGaleri(Request $request)
+    {
+        $request->validate([
+            'gambar' => 'required|image|mimes:jpeg,png,jpg,webp|max:3072', // Maksimal 3MB
+            'judul' => 'nullable|string|max:255',
+        ]);
+
+        // Simpan file fisik ke folder 'storage/app/public/galeri'
+        $path = $request->file('gambar')->store('galeri', 'public');
+
+        Galeri::create([
+            'gambar' => $path,
+            'judul' => $request->judul,
+        ]);
+
+        return back()->with('success', 'Foto berhasil diunggah ke Galeri.');
+    }
+
+    // Tambahkan fungsi untuk HAPUS FOTO
+    public function destroyGaleri($id)
+    {
+        $galeri = Galeri::findOrFail($id);
+
+        // Hapus file fisiknya dari folder storage
+        if (Storage::disk('public')->exists($galeri->gambar)) {
+            Storage::disk('public')->delete($galeri->gambar);
+        }
+
+        // Hapus data dari database
+        $galeri->delete();
+
+        return back()->with('success', 'Foto berhasil dihapus.');
     }
 
     public function tiket()

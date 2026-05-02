@@ -1,11 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PemesananController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Galeri;
 use App\Models\Pemesanan;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,11 +16,13 @@ use App\Models\Pemesanan;
 
 // Landing Page (halaman utama)
 Route::get('/', function () {
-    return view('landing');
+    $galeris = Galeri::latest()->get();
+return view('landing', compact('galeris'));
 });
 
 Route::get('/landing', function () {
-    return view('landing');
+    $galeris = Galeri::latest()->get();
+return view('landing', compact('galeris'));
 })->name('landing');
 
 Route::get('/admin/login', [AdminAuthController::class, 'create'])->name('admin.login');
@@ -64,6 +67,8 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/transaksi', [AdminController::class, 'transaksi'])->name('admin.transaksi');
     Route::get('/admin/galeri', [AdminController::class, 'galeri'])->name('admin.galeri');
+    Route::post('/admin/galeri', [AdminController::class, 'storeGaleri'])->name('admin.galeri.store');
+    Route::delete('/admin/galeri/{id}', [AdminController::class, 'destroyGaleri'])->name('admin.galeri.destroy');
     Route::get('/admin/tiket-wisata', [AdminController::class, 'tiket'])->name('admin.tiket');
     Route::post('/admin/tiket-wisata', [AdminController::class, 'storeTiket'])->name('admin.tiket.store');
     Route::put('/admin/tiket-wisata/{id}', [AdminController::class, 'updateTiket'])->name('admin.tiket.update');
