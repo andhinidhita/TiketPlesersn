@@ -56,6 +56,8 @@ Route::middleware(['auth'])->group(function () {
     // Invoice
     Route::get('/invoice/{id}', [PemesananController::class, 'invoice'])->name('invoice');
     Route::get('/riwayat', [PemesananController::class, 'riwayat'])->name('riwayat');
+    Route::patch('/pemesanan/{pemesanan}/lanjut-tanpa-item', [PemesananController::class, 'acceptPartial'])->name('pemesanan.accept-partial');
+    Route::patch('/pemesanan/{pemesanan}/batal', [PemesananController::class, 'cancel'])->name('pemesanan.cancel');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -65,7 +67,9 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin/dashboard/export', [AdminController::class, 'exportDashboard'])->name('admin.dashboard.export');
     Route::get('/admin/transaksi', [AdminController::class, 'transaksi'])->name('admin.transaksi');
+    Route::get('/admin/transaksi/export', [AdminController::class, 'exportTransaksi'])->name('admin.transaksi.export');
     Route::get('/admin/galeri', [AdminController::class, 'galeri'])->name('admin.galeri');
     Route::post('/admin/galeri', [AdminController::class, 'storeGaleri'])->name('admin.galeri.store');
     Route::delete('/admin/galeri/{id}', [AdminController::class, 'destroyGaleri'])->name('admin.galeri.destroy');
@@ -78,6 +82,9 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/admin/transaksi/{pemesanan}/edit', [AdminController::class, 'editTransaksi'])->name('admin.transaksi.edit');
     Route::patch('/admin/transaksi/{pemesanan}', [AdminController::class, 'updateTransaksi'])->name('admin.transaksi.update');
     Route::delete('/admin/transaksi/{pemesanan}', [AdminController::class, 'destroyTransaksi'])->name('admin.transaksi.destroy');
+    Route::patch('/admin/transaksi/{pemesanan}/tersedia', [AdminController::class, 'approveAvailability'])->name('admin.transaksi.approve');
+    Route::patch('/admin/transaksi/{pemesanan}/sebagian-kosong', [AdminController::class, 'partialAvailability'])->name('admin.transaksi.partial');
+    Route::patch('/admin/transaksi/{pemesanan}/tidak-tersedia', [AdminController::class, 'rejectAvailability'])->name('admin.transaksi.reject');
     Route::post('/admin/verifikasi/{id}', [AdminController::class, 'verifikasi'])->name('admin.verifikasi');
 });
 

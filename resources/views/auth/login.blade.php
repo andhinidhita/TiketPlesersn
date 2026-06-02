@@ -12,7 +12,7 @@
 <body class="bg-slate-50 font-sans text-slate-900 antialiased">
     <main class="min-h-screen lg:grid lg:grid-cols-[1.05fr_0.95fr]">
         <section class="relative hidden overflow-hidden lg:block">
-            <img src="{{ asset('images/bg.png') }}" alt="Bumi Perkemahan Pleseran" class="absolute inset-0 h-full w-full object-cover">
+            <img src="{{ asset('images/bgpleseran2.jpg') }}" alt="Bumi Perkemahan Pleseran" class="absolute inset-0 h-full w-full object-cover">
             <div class="absolute inset-0 bg-slate-950/50"></div>
             <div class="relative z-10 flex min-h-screen flex-col justify-between p-10 text-white">
                 <a href="{{ route('landing') }}" class="text-lg font-bold tracking-tight">Bumi Perkemahan Pleseran</a>

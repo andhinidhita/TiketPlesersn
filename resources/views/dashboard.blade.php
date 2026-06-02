@@ -69,8 +69,8 @@
                 <div class="flex gap-3">
                     <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-bold text-emerald-700">2</span>
                     <div>
-                        <p class="font-semibold text-slate-950">Upload bukti pembayaran</p>
-                        <p class="mt-1 text-sm text-slate-500">Transfer ke rekening yang tersedia, lalu unggah bukti.</p>
+                        <p class="font-semibold text-slate-950">Transfer pembayaran</p>
+                        <p class="mt-1 text-sm text-slate-500">Gunakan nominal sesuai total yang muncul di invoice.</p>
                     </div>
                 </div>
                 <div class="flex gap-3">
@@ -83,7 +83,7 @@
             </div>
         </div>
 
-        <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <!-- <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p class="text-sm font-semibold uppercase tracking-wide text-emerald-700">Rekening Pembayaran</p>
@@ -94,6 +94,6 @@
                     Buat Pesanan
                 </a>
             </div>
-        </div>
+        </div> -->
     </section>
 @endsection

@@ -27,15 +27,17 @@
         </div>
     </nav>
 
-    <header class="relative min-h-[88vh] overflow-hidden">
+    <header class="relative min-h-[88vh] overflow-hidden bg-slate-950">
         <img src="{{ asset('images/bg.png') }}" alt="Bumi Perkemahan Pleseran"
-            class="absolute inset-0 h-full w-full object-cover">
-        <div class="absolute inset-0 bg-slate-950/45"></div>
+            class="absolute inset-0 h-full w-full object-cover object-center opacity-90">
+        <div class="absolute inset-0 bg-slate-950/35"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/62 to-slate-950/18"></div>
+        <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-slate-950/55 to-transparent"></div>
         <div class="relative z-10 mx-auto flex min-h-[88vh] max-w-7xl items-end px-5 pb-16 pt-28 sm:px-8">
-            <div class="max-w-3xl text-white">
-                <p class="text-sm font-semibold uppercase tracking-wide text-emerald-200">Tawangmangu, Karanganyar</p>
-                <h1 class="mt-4 text-4xl font-extrabold tracking-tight sm:text-6xl">Bumi Perkemahan Pleseran</h1>
-                <p class="mt-5 max-w-2xl text-base leading-7 text-white/85 sm:text-lg">
+            <div class="max-w-3xl text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.35)]">
+                <p class="text-sm font-bold uppercase tracking-wide text-emerald-200">Tawangmangu, Karanganyar</p>
+                <h1 class="mt-4 max-w-2xl text-4xl font-extrabold tracking-tight sm:text-6xl">Bumi Perkemahan Pleseran</h1>
+                <p class="mt-5 max-w-xl text-base leading-7 text-white/90 sm:text-lg">
                     Area camping dan wisata alam dengan suasana hutan, aliran sungai, dan udara pegunungan yang cocok
                     untuk liburan keluarga maupun kegiatan komunitas.
                 </p>
@@ -55,7 +57,7 @@
 
     <section id="about" class="px-5 py-16 sm:px-8">
         <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-center">
-            <img src="{{ asset('images/about.png') }}" alt="Area wisata Pleseran"
+            <img src="{{ asset('images/about2.jpg') }}" alt="Area wisata Pleseran"
                 class="h-full max-h-[460px] w-full rounded-lg object-cover shadow-sm">
             <div>
                 <p class="text-sm font-semibold uppercase tracking-wide text-emerald-700">Tentang Lokasi</p>
@@ -177,14 +179,14 @@
             <div>
                 <p class="text-sm font-semibold uppercase tracking-wide text-emerald-200">Reservasi Online</p>
                 <h2 class="mt-3 text-3xl font-bold tracking-tight">Pesan tiket tanpa harus antre di lokasi.</h2>
-                <p class="mt-4 leading-7 text-white/75">Pilih tiket, isi tanggal kunjungan, unggah bukti pembayaran,
+                <p class="mt-4 leading-7 text-white/75">Pilih tiket, isi tanggal kunjungan, melakukan pembayaran,
                     lalu tunggu admin memverifikasi pesananmu.</p>
                 <a href="{{ auth()->check() ? route('pemesanan') : route('login') }}"
                     class="mt-7 inline-flex rounded-md bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700">
                     Mulai Pesan
                 </a>
             </div>
-            <img src="{{ asset('images/g5.png') }}" alt="Area camping Pleseran"
+            <img src="{{ asset('images/bgtelaga2.jpg') }}" alt="Area camping Pleseran"
                 class="aspect-[4/3] w-full rounded-lg object-cover">
         </div>
     </section>

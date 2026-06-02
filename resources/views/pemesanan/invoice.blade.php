@@ -8,14 +8,14 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    @if($pemesanan->status === 'pending')
+    @if($pemesanan->status === 'pending' && $pemesanan->availability_status === 'approved' && auth()->user()->role !== 'admin')
         <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
     @endif
 </head>
 <body class="bg-slate-50 font-sans text-slate-900 antialiased">
     <main class="mx-auto min-h-screen max-w-4xl px-5 py-8">
         <div class="mb-5 flex items-center justify-between print:hidden">
-            <a href="{{ route('riwayat') }}" class="text-sm font-semibold text-slate-600 hover:text-slate-950">Kembali</a>
+            <a href="{{ auth()->user()->role === 'admin' ? route('admin.transaksi') : route('riwayat') }}" class="text-sm font-semibold text-slate-600 hover:text-slate-950">Kembali</a>
             <button onclick="window.print()" class="rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
                 Cetak
             </button>
@@ -51,21 +51,38 @@
                 </div>
             </div>
 
+            @if($pemesanan->availability_status !== 'approved')
+                <div class="mt-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    Pesanan ini belum bisa dibayar karena masih menunggu konfirmasi ketersediaan dari admin.
+                </div>
+            @endif
+
             <div class="overflow-x-auto py-6">
                 <table class="min-w-full divide-y divide-slate-200">
                     <thead>
                         <tr>
                             <th class="py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Tiket</th>
+                            <th class="py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Paket</th>
                             <th class="py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Harga</th>
                             <th class="py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Jumlah</th>
+                            <th class="py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Durasi</th>
                             <th class="py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Total</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         <tr>
                             <td class="py-4 text-sm font-semibold text-slate-950">{{ $pemesanan->tiket->nama_tiket }}</td>
+                            <td class="py-4 text-sm text-slate-600">
+                                @if($pemesanan->paket_camping)
+                                    <p class="font-semibold text-slate-950">{{ $pemesanan->paket_camping }}</p>
+                                    <p class="mt-1 text-xs text-slate-500">Rp {{ number_format($pemesanan->harga_paket,0,',','.') }}/hari</p>
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td class="py-4 text-right text-sm text-slate-600">Rp {{ number_format($pemesanan->tiket->harga,0,',','.') }}</td>
                             <td class="py-4 text-right text-sm text-slate-600">{{ $pemesanan->jumlah_tiket }}</td>
+                            <td class="py-4 text-right text-sm text-slate-600">{{ $pemesanan->durasi }} hari</td>
                             <td class="py-4 text-right text-sm font-semibold text-slate-950">Rp {{ number_format($pemesanan->total_harga,0,',','.') }}</td>
                         </tr>
                     </tbody>
@@ -75,8 +92,12 @@
             <div class="flex justify-end border-t border-slate-200 pt-6">
                 <div class="w-full max-w-xs">
                     <div class="flex items-center justify-between text-sm text-slate-500">
-                        <span>Subtotal</span>
-                        <span>Rp {{ number_format($pemesanan->total_harga,0,',','.') }}</span>
+                        <span>Rental / hari</span>
+                        <span>Rp {{ number_format($pemesanan->rental_total,0,',','.') }}</span>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-sm text-slate-500">
+                        <span>Durasi</span>
+                        <span>{{ $pemesanan->durasi }} hari</span>
                     </div>
                     <div class="mt-3 flex items-center justify-between text-lg font-bold text-slate-950">
                         <span>Total</span>
@@ -85,7 +106,21 @@
                 </div>
             </div>
 
-            @if($pemesanan->status === 'pending')
+            @if(! empty($pemesanan->rental_items))
+                <div class="mt-6 border-t border-slate-200 pt-6">
+                    <p class="text-sm font-bold text-slate-950">Rental Tambahan</p>
+                    <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                        @foreach($pemesanan->rental_items as $item)
+                            <div class="rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                                <span class="font-semibold text-slate-950">{{ $item['nama'] }}</span>
+                                <span> x{{ $item['jumlah'] }} - Rp {{ number_format($item['subtotal'],0,',','.') }}/hari</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            @if($pemesanan->status === 'pending' && $pemesanan->availability_status === 'approved' && auth()->user()->role !== 'admin')
             <div class="mt-8 flex justify-end print:hidden">
                 <button id="pay-button" class="inline-flex items-center justify-center rounded-md bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
                     Bayar Sekarang
@@ -106,7 +141,7 @@
             </div>
             
             <h3 class="mt-5 text-xl font-bold text-slate-950">Pembayaran Berhasil!</h3>
-            <p class="mt-2 text-sm text-slate-500">Terima kasih, pembayaran tiket Anda telah kami terima dan terkonfirmasi.</p>
+            <p class="mt-2 text-sm text-slate-500">Terima kasih, pembayaran tiket Anda sudah masuk dan menunggu verifikasi admin.</p>
             
             <button id="btn-lihat-tiket" class="mt-6 w-full rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
                 Lihat Tiket Saya
@@ -114,15 +149,29 @@
         </div>
     </div>
 
-    @if($pemesanan->status === 'pending' && isset($snapToken))
+    @if($pemesanan->status === 'pending' && $pemesanan->availability_status === 'approved' && auth()->user()->role !== 'admin' && isset($snapToken))
     <script type="text/javascript">
         var payButton = document.getElementById('pay-button');
         var successModal = document.getElementById('success-modal');
         var btnLihatTiket = document.getElementById('btn-lihat-tiket');
 
+        function syncMidtransResult(result) {
+            fetch("{{ url('/midtrans/callback') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(result),
+                keepalive: true,
+            });
+        }
+
         payButton.addEventListener('click', function () {
             window.snap.pay('{{ $snapToken }}', {
                 onSuccess: function(result){
+                    syncMidtransResult(result);
+
                     // 1. Munculkan Modal Keren kita (Hapus class 'hidden')
                     successModal.classList.remove('hidden');
                     successModal.classList.add('flex');
@@ -138,6 +187,7 @@
                     }, 4000);
                 },
                 onPending: function(result){
+                    syncMidtransResult(result);
                     alert("Menunggu pembayaran Anda!");
                 },
                 onError: function(result){
