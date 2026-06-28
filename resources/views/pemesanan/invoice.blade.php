@@ -8,7 +8,13 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    @if($pemesanan->status === 'pending' && $pemesanan->availability_status === 'approved' && auth()->user()->role !== 'admin')
+    @php
+        $canPay = $pemesanan->status === 'pending'
+            && $pemesanan->availability_status === 'approved'
+            && auth()->user()->role !== 'admin';
+    @endphp
+
+    @if($canPay)
         <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
     @endif
 </head>
@@ -120,12 +126,18 @@
                 </div>
             @endif
 
-            @if($pemesanan->status === 'pending' && $pemesanan->availability_status === 'approved' && auth()->user()->role !== 'admin')
+            @if($canPay)
             <div class="mt-8 flex justify-end print:hidden">
-                <button id="pay-button" class="inline-flex items-center justify-center rounded-md bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                <button id="pay-button" type="button" @disabled(empty($snapToken)) class="inline-flex items-center justify-center rounded-md px-6 py-3 text-sm font-bold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 {{ empty($snapToken) ? 'cursor-not-allowed bg-slate-400' : 'bg-emerald-700 hover:bg-emerald-800' }}">
                     Bayar Sekarang
                 </button>
             </div>
+
+            @if(empty($snapToken))
+                <p class="mt-3 text-right text-sm text-red-600 print:hidden">
+                    Tombol bayar belum siap. Periksa koneksi internet dan konfigurasi Midtrans, lalu refresh halaman.
+                </p>
+            @endif
             @endif
 
         </section>
@@ -149,7 +161,7 @@
         </div>
     </div>
 
-    @if($pemesanan->status === 'pending' && $pemesanan->availability_status === 'approved' && auth()->user()->role !== 'admin' && isset($snapToken))
+    @if($canPay && ! empty($snapToken))
     <script type="text/javascript">
         var payButton = document.getElementById('pay-button');
         var successModal = document.getElementById('success-modal');
@@ -168,6 +180,11 @@
         }
 
         payButton.addEventListener('click', function () {
+            if (!window.snap) {
+                alert('Script Midtrans belum berhasil dimuat. Pastikan internet aktif, lalu refresh halaman.');
+                return;
+            }
+
             window.snap.pay('{{ $snapToken }}', {
                 onSuccess: function(result){
                     syncMidtransResult(result);

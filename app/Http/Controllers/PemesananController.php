@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PaketCamping;
+use App\Models\Pembayaran;
 use App\Models\Pemesanan;
 use App\Models\Tiket;
 use Illuminate\Http\Request;
@@ -15,40 +17,15 @@ class PemesananController extends Controller
 {
     private function campingPackages(): array
     {
-        return [
-            'Paket A' => [
-                'harga' => 275000,
-                'fasilitas' => 'Tenda kaps 4, kasur 2, sleeping bag 2, matras 1, kursi set 1, listrik 1, kayu bakar 1',
-            ],
-            'Paket B' => [
-                'harga' => 250000,
-                'fasilitas' => 'Tenda kaps 4, kasur 3, sleeping bag 3, kursi set 1, listrik 1',
-            ],
-            'Paket C' => [
-                'harga' => 185000,
-                'fasilitas' => 'Tenda kaps 4, kasur 2, sleeping bag 2, kursi set 1',
-            ],
-            'Paket D' => [
-                'harga' => 150000,
-                'fasilitas' => 'Tenda kaps 4, kasur 3, sleeping bag 3',
-            ],
-            'Paket A+' => [
-                'harga' => 450000,
-                'fasilitas' => 'Tenda kaps 6-8, kasur oscar 4, sleeping bag 4, kursi PTL 1, kompor set',
-            ],
-            'Paket B+' => [
-                'harga' => 500000,
-                'fasilitas' => 'Tenda kaps 6-8, kasur busa 1, bantal guling 1, bed cover 1, kursi PTL 1, kompor set 1, tikar 1, kayu bakar 1, listrik 1',
-            ],
-            'Paket Camping Deck Weekday' => [
-                'harga' => 500000,
-                'fasilitas' => 'Tenda kaps 6-8, kasur busa, bantal guling, bed cover, alas spons, kursi set, kompor dan cooking set, listrik + lampu, free HTM 4 orang, free parkir, free MCK',
-            ],
-            'Paket Camping Deck Weekend' => [
-                'harga' => 700000,
-                'fasilitas' => 'Tenda kaps 6-8, kasur busa, bantal guling, bed cover, alas spons, kursi set, kompor dan cooking set, listrik + lampu, free HTM 4 orang, free parkir, free MCK',
-            ],
-        ];
+        return PaketCamping::orderBy('nama_paket')
+            ->get()
+            ->mapWithKeys(fn (PaketCamping $paket) => [
+                $paket->nama_paket => [
+                    'harga' => $paket->harga,
+                    'fasilitas' => $paket->fasilitas,
+                ],
+            ])
+            ->all();
     }
 
     private function rentalItems(): array
@@ -112,6 +89,7 @@ class PemesananController extends Controller
             $campingPackages = $this->campingPackages();
             $rentalPricelist = $this->rentalItems();
             $selectedPackage = null;
+            $selectedPackageId = null;
             $selectedRentals = [];
             $rentalTotal = 0;
 
@@ -123,7 +101,8 @@ class PemesananController extends Controller
                         ->throwResponse();
                 }
 
-                $selectedPackage = $campingPackages[$validated['paket_camping']];
+                $selectedPackage = PaketCamping::where('nama_paket', $validated['paket_camping'])->firstOrFail();
+                $selectedPackageId = $selectedPackage->id;
 
                 foreach ($validated['rental_items'] ?? [] as $itemName => $quantity) {
                     $quantity = (int) $quantity;
@@ -143,7 +122,7 @@ class PemesananController extends Controller
                 }
             }
 
-            $hargaPaket = $selectedPackage['harga'] ?? 0;
+            $hargaPaket = $selectedPackage?->harga ?? 0;
             $totalPerHari = ($tiket->harga * $validated['jumlah_tiket']) + $hargaPaket + $rentalTotal;
 
             if (! $isCamping) {
@@ -160,6 +139,7 @@ class PemesananController extends Controller
             return Pemesanan::create([
                 'user_id' => Auth::id(),
                 'tiket_id' => $tiket->id,
+                'paket_camping_id' => $selectedPackageId,
                 'jumlah_tiket' => $validated['jumlah_tiket'],
                 'tanggal' => $validated['tanggal'],
                 'paket_camping' => $isCamping ? $validated['paket_camping'] : null,
@@ -208,7 +188,7 @@ class PemesananController extends Controller
 
     public function invoice($id)
     {
-        $query = Pemesanan::with('tiket', 'user')->whereKey($id);
+        $query = Pemesanan::with('tiket', 'user', 'paketCamping', 'pembayaran')->whereKey($id);
 
         if (auth()->user()->role !== 'admin') {
             $query->where('user_id', auth()->id());
@@ -225,10 +205,11 @@ class PemesananController extends Controller
             Config::$isSanitized = config('midtrans.is_sanitized');
             Config::$is3ds = config('midtrans.is_3ds');
 
+            $orderId = 'CAMP-' . $pemesanan->id . '-' . time();
+
            $params = [
                 'transaction_details' => [
-                    // Tambahkan time() agar order_id selalu unik setiap kali direfresh
-                    'order_id' => 'CAMP-' . $pemesanan->id . '-' . time(),
+                    'order_id' => $orderId,
                     'gross_amount' => $pemesanan->total_harga,
                 ],
                 'customer_details' => [
@@ -238,6 +219,16 @@ class PemesananController extends Controller
             ];
 
             $snapToken = Snap::getSnapToken($params);
+
+            Pembayaran::updateOrCreate(
+                ['pemesanan_id' => $pemesanan->id],
+                [
+                    'order_id' => $orderId,
+                    'metode' => 'midtrans',
+                    'status' => 'pending',
+                    'jumlah_bayar' => $pemesanan->total_harga,
+                ]
+            );
         }
 
         return view('pemesanan.invoice', compact('pemesanan', 'snapToken'));
@@ -335,6 +326,17 @@ class PemesananController extends Controller
                     'midtrans_status' => $request->transaction_status,
                     'paid_at' => $isPaid ? now() : $pemesanan->paid_at,
                 ]);
+
+                Pembayaran::updateOrCreate(
+                    ['pemesanan_id' => $pemesanan->id],
+                    [
+                        'order_id' => $request->order_id,
+                        'metode' => 'midtrans',
+                        'status' => $request->transaction_status,
+                        'jumlah_bayar' => (int) $request->gross_amount,
+                        'paid_at' => $isPaid ? now() : $pemesanan->paid_at,
+                    ]
+                );
             }
         }
         
