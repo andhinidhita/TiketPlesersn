@@ -95,6 +95,20 @@
                 </table>
             </div>
 
+            @if(! empty($pemesanan->rental_items))
+                <div class="border-t border-slate-200 py-6">
+                    <p class="text-sm font-bold text-slate-950">Rental Tambahan</p>
+                    <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                        @foreach($pemesanan->rental_items as $item)
+                            <div class="rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                                <span class="font-semibold text-slate-950">{{ $item['nama'] }}</span>
+                                <span> x{{ $item['jumlah'] }} - Rp {{ number_format($item['subtotal'],0,',','.') }}/hari</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
             <div class="flex justify-end border-t border-slate-200 pt-6">
                 <div class="w-full max-w-xs">
                     <div class="flex items-center justify-between text-sm text-slate-500">
@@ -111,20 +125,6 @@
                     </div>
                 </div>
             </div>
-
-            @if(! empty($pemesanan->rental_items))
-                <div class="mt-6 border-t border-slate-200 pt-6">
-                    <p class="text-sm font-bold text-slate-950">Rental Tambahan</p>
-                    <div class="mt-3 grid gap-2 sm:grid-cols-2">
-                        @foreach($pemesanan->rental_items as $item)
-                            <div class="rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-600">
-                                <span class="font-semibold text-slate-950">{{ $item['nama'] }}</span>
-                                <span> x{{ $item['jumlah'] }} - Rp {{ number_format($item['subtotal'],0,',','.') }}/hari</span>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
 
             @if($canPay)
             <div class="mt-8 flex justify-end print:hidden">
